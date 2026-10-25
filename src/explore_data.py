@@ -77,10 +77,19 @@ for label in data_path.rglob("*.txt"):
         if len(values) != 5:
             invalid +=1
 
-print("Invalid annotationP:",invalid)
+print("Invalid annotation:",invalid)
 
 
 
+
+# split data
+
+val_path = data_path/"Val"
+som = 0
+for class_folder in val_path.iterdir():
+    images = list((class_folder/"images").glob("*.jpg"))
+    som += len(images)
+print("total images :",som)
 
 
 
