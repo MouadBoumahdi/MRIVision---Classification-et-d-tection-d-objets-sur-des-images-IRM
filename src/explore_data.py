@@ -57,9 +57,6 @@ for image in images[:5]:
 
 
 
-# annotation:information added to image to
-# help the model undersatand what is in the
-# image or where its located(labels)
 
 train_labels = list(data_path.glob("Train/*/labels/*.txt"))
 val_labels = list(data_path.glob("Val/*/labels/*.txt"))
@@ -83,7 +80,6 @@ print("Invalid annotation:",invalid)
 
 
 # split data
-
 val_path = data_path/"Val"
 som = 0
 for class_folder in val_path.iterdir():

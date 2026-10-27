@@ -20,7 +20,7 @@ x = base_model(inputs, training=False)
 x = layers.GlobalAveragePooling2D()(x)
 x = layers.Dropout(0.3)(x)
 
-outputs = layers.Dense(4, activation="softmax")(x)
+outputs = layers.Dense(4, activation="softmax",kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
 model = Model(inputs=inputs, outputs=outputs)
 
 
@@ -39,18 +39,33 @@ early_stopping = tf.keras.callbacks.EarlyStopping(
 )
 
 
-# history = model.fit(
-#     train_ds,
-#     validation_data = val_ds,
-#     epochs=10,
-#     callbacks=[early_stopping]
-# )
-
-model.save("mobilenetv2.keras")
+checkpoint = tf.keras.callbacks.ModelCheckpoint(
+    filepath='mobilenetv2.keras',
+    monitor='val_loss',
+    save_best_only=True,
+    mode='min'
+)
 
 
-test_loss, test_accurcay = model.evaluate(test_ds)
-print("Test accuracy: ",test_accurcay)
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.2,
+    patience=3
+)
+
+
+history = model.fit(
+    train_ds,
+    validation_data = val_ds,
+    epochs=10,
+    callbacks=[early_stopping,checkpoint,reduce_lr]
+)
+
+
+
+
+test_loss, test_accuracy = model.evaluate(test_ds)
+print("Test accuracy: ",test_accuracy)
 print("Test Loss: ",test_loss)
 
 
