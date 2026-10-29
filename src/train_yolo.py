@@ -1,42 +1,32 @@
+
+import torch
 from ultralytics import YOLO
 from pathlib import Path
 
-data_path = Path("data/archive")
+
+def main():
+    data_yaml = Path("data/yolo_dataset/data.yaml")
+
+    print("YAML exists:", data_yaml.exists())
+    print("CUDA available:", torch.cuda.is_available())
+
+    if torch.cuda.is_available():
+        print("GPU:", torch.cuda.get_device_name(0))
+
+    model = YOLO("yolov8n.pt")
+    print("YOLO model loaded")
+
+    results = model.train(
+        data=str(data_yaml),
+        epochs=50,
+        imgsz=640,
+        batch=8,
+        device=0,
+        name="yolov8n_brain_tumors"
+    )
+
+    print("Training finished!")
 
 
-
-classes = ["Glioma", "Meningioma", "No Tumor", "Pituitary"]
-
-for class_name in classes:
-    image_path = data_path / "Train" / class_name / "images"
-    labels_path = data_path / "Train" / class_name / "labels"
-    
-
-    images = list(image_path.glob("*.jpg"))
-    labels = list(labels_path.glob("*.txt"))
-
-    print("Images :", len(images))
-    print("Annotations :", len(labels))
-
-
-    if labels:
-        label = labels[0]
-        print("Fichier: ",label.name)
-        print("Contenu:", label.read_text())
-
-        for line in label.read_text().splitlines():
-            values =  line.split()
-
-            if len(values)!=5:
-                print("Format incorrect :", line)
-                continue
-
-            try:
-                class_id = int(values[0])
-                x,y,w,h = map(float,values[1:])
-
-                print("Class Id:", class_id)
-                print("Coordonnees: ", x,y,w,h)
-
-            except ValueError:
-                print("Valeurs invalides: ",line)
+if __name__ == "__main__":
+    main()
